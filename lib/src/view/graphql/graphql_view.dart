@@ -2,19 +2,53 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intagrations_apis_and_graphql/src/data/models/post.dart';
+import '../../data/datasource/check_network.dart';
 import '../../domain/manager/export.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
+
 class GraphQLScreen extends StatefulWidget {
-  const GraphQLScreen({Key? key}) : super(key: key);
+  const GraphQLScreen({super.key});
 
   @override
   _GraphQLScreenState createState() => _GraphQLScreenState();
 }
 
 class _GraphQLScreenState extends State<GraphQLScreen> {
+
+  final CheckNetwork _checkNetwork = CheckNetwork(Connectivity());
   @override
   void initState() {
     super.initState();
-    context.read<GraphQLBloc>().add(FetchPosts());
+    _fetchData(context);
+  }
+  Future<void> _fetchData(BuildContext context) async {
+    bool isConnected = await _checkNetwork.isConnected();
+    if (!isConnected) {
+      _showRetryDialog(context);
+      return;
+    }
+     context.read<GraphQLBloc>().add(FetchPosts());
+    
+  }
+
+  void _showRetryDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: Text('No Internet Connection'),
+        content: Text('Please check your connection and try again.'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              _fetchData(context);
+            },
+            child: Text('Retry'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override

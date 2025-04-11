@@ -5,7 +5,7 @@ import '../../data/export.dart';
 import '../../domain/manager/export.dart';
 
 class SqfliteScreen extends StatefulWidget {
-  const SqfliteScreen({Key? key}) : super(key: key);
+  const SqfliteScreen({super.key});
 
   @override
   _SqfliteScreenState createState() => _SqfliteScreenState();

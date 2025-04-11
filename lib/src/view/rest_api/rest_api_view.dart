@@ -1,21 +1,53 @@
 // screens/rest_api_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../data/datasource/check_network.dart';
 import '../../data/export.dart';
 import '../../domain/manager/export.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 class RestApiScreen extends StatefulWidget {
-  const RestApiScreen({Key? key}) : super(key: key);
+  const RestApiScreen({super.key});
 
   @override
   _RestApiScreenState createState() => _RestApiScreenState();
 }
 
 class _RestApiScreenState extends State<RestApiScreen> {
+
+   final CheckNetwork _checkNetwork = CheckNetwork(Connectivity());
   @override
   void initState() {
     super.initState();
+    _fetchData(context);
+  }
+   Future<void> _fetchData(BuildContext context) async {
+    bool isConnected = await _checkNetwork.isConnected();
+    if (!isConnected) {
+      _showRetryDialog(context);
+      return;
+    }
     context.read<RestApiBloc>().add(FetchUsers());
+  }
+
+  void _showRetryDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: Text('No Internet Connection'),
+        content: Text('Please check your connection and try again.'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              _fetchData(context);
+            },
+            child: Text('Retry'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override

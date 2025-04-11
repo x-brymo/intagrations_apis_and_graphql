@@ -5,7 +5,7 @@ import '../../data/export.dart';
 import '../../domain/manager/export.dart';
 
 class HiveScreen extends StatefulWidget {
-  const HiveScreen({Key? key}) : super(key: key);
+  const HiveScreen({super.key});
 
   @override
   _HiveScreenState createState() => _HiveScreenState();
